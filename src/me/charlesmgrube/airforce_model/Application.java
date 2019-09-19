@@ -9,8 +9,8 @@ import java.util.List;
 
 public class Application {
 
-	private ArrayList<Location> targets = new ArrayList<Location>();
-	private ArrayList<Location> bases = new ArrayList<Location>();
+	private final ArrayList<Location> targets = new ArrayList<Location>();
+	private final ArrayList<Location> bases = new ArrayList<Location>();
 	private Location mainBase;
 
 	private int numBases = 0;
@@ -48,17 +48,9 @@ public class Application {
 		for(int i = 0; i < data.size() ; i++) {
 			if(i == 0) continue;
 			if(i <= numBases) {
-				String[] split = data.get(i).split(" ");
-				int x = Integer.parseInt(split[0]);
-				int y = Integer.parseInt(split[1]);
-				int id = Integer.parseInt(split[2]);
-				bases.add(new Location(x, y, id));
+				bases.add(new Location(data.get(i)));
 			} else if (i > numBases && i <= numTargets+numBases) {
-				String[] split = data.get(i).split(" ");
-				int x = Integer.parseInt(split[0]);
-				int y = Integer.parseInt(split[1]);
-				int id = Integer.parseInt(split[2]);
-				targets.add(new Location(x, y, id));
+				targets.add(new Location(data.get(i)));
 			} else {
 				String[] split = data.get(i).split(" ");
 				int x = Integer.parseInt(split[0]);
@@ -68,10 +60,10 @@ public class Application {
 		}
 		
 		ArrayList<Integer> times = new ArrayList<Integer>();
-		for(int x = 0; x < bases.size(); x++) {
+		for (Location base: bases) {
 			int quickestTime = -1;
-			for(int y = 0; y < targets.size(); y++) {
-				int time = timeElapsed(bases.get(x), targets.get(y)) + timeElapsed(targets.get(y), mainBase);
+			for(Location target : targets) {
+				int time = Location.timeElapsed(base, target) + Location.timeElapsed(target, mainBase);
 				if(time < quickestTime || quickestTime==-1) {
 					quickestTime = time;
 				}
@@ -91,22 +83,8 @@ public class Application {
 		
 		System.out.println(num);
 	}
-	
-	private int timeElapsed(Location loc1, Location loc2) {
-		int manhattanDistance = Math.abs(loc2.getX() - loc1.getX()) + Math.abs(loc2.getY() - loc1.getY());
-		List<Integer> factors = primeFactorization(manhattanDistance);
-		factors.sort(Comparator.naturalOrder());
-		int factor = -1;
-		for(int i = 0; i < factors.size(); i++) {
-			if(factors.get(i) > loc1.getId()) {
-				factor = i;
-			}
-		}
-		if(factor == -1) factor = loc1.getId();
-		return 0;
-	}
 
-	private List<Integer> primeFactorization(int n) {
+	public static List<Integer> primeFactorization(int n) {
 		int num = n;
 		ArrayList<Integer> factors = new ArrayList<Integer>();
 		for (int i = 2; i < num; i++) {
